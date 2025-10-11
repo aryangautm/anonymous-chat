@@ -1,2 +1,8 @@
 fastapi
 uvicorn[standard]
+semantic-router
+pydantic
+pydantic-settings
+sqlalchemy
+asyncpg
+psycopg2-binary
