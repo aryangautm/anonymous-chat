@@ -6,3 +6,10 @@ pydantic-settings
 sqlalchemy
 asyncpg
 psycopg2-binary
+alembic
+black
+isort
+flake8
+flake8-print
+flake8-bugbear
+flake8-comprehensions

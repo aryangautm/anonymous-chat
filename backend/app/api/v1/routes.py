@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from .endpoints import request_logs
 from app.core.auth import require_api_key
+
+from .endpoints import request_logs
 
 api_router = APIRouter()
 

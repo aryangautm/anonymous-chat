@@ -1,27 +1,23 @@
-from pathlib import Path
+"""
+Application configuration and settings.
 
-from pydantic_settings import BaseSettings
+This module extends the base configuration with additional settings required
+for the FastAPI application to run, such as CORS origins and authentication keys.
+"""
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+from .base_config import BaseConfig
 
 
-class Settings(BaseSettings):
+class Settings(BaseConfig):
     """
-    Manages application settings loaded from environment variables.
+    Complete application settings including all environment variables.
+
+    Inherits from BaseConfig to ensure database settings are available,
+    and adds application-specific settings like CORS and authentication.
     """
 
     CORS_ORIGINS: str
-    DATABASE_URL: str
     APP_AUTH_KEY: str
-
-    @property
-    def SYNC_DATABASE_URL(self) -> str:
-        return self.DATABASE_URL.replace("+asyncpg", "+psycopg2")
-
-    class Config:
-        env_file = PROJECT_ROOT / ".env"
-        env_file_encoding = "utf-8"
-        extra = "ignore"
 
 
 settings = Settings()

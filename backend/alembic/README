@@ -1,0 +1,398 @@
+# Alembic Database Migrations
+
+This directory contains database migrations for the Anonymous Chat application.
+
+## Overview
+
+Alembic is a lightweight database migration tool for usage with SQLAlchemy. This setup is production-ready and follows enterprise best practices.
+
+## Architecture
+
+### Configuration Structure
+
+```
+backend/
+├── alembic/
+│   ├── versions/          # Migration files
+│   ├── env.py            # Migration environment (configured for FastAPI)
+│   ├── script.py.mako    # Template for new migrations
+│   └── README            # Alembic's default README
+├── alembic.ini           # Alembic configuration
+├── scripts/
+│   └── init_database.py  # Database initialization script
+└── app/
+    ├── core/
+    │   ├── base_config.py    # Minimal config for migrations (DATABASE_URL only)
+    │   ├── config.py         # Full app config (inherits from base_config)
+    │   └── database.py       # SQLAlchemy engines and sessions
+    └── models/
+        ├── base.py           # SQLAlchemy Base (separate to avoid circular imports)
+        └── *.py              # Your models
+```
+
+### Key Design Decisions
+
+1. **Separate Base Config**: `base_config.py` requires only `DATABASE_URL`, allowing Alembic to run without all application environment variables.
+
+2. **Separate Base Class**: `models/base.py` contains only the declarative base, preventing engine creation during imports.
+
+3. **Timestamped Migrations**: Migration files include date/time for better tracking and ordering.
+
+4. **Automatic Extensions**: The init script automatically installs required PostgreSQL extensions (pgvector).
+
+## Prerequisites
+
+- PostgreSQL server running
+- Database connection details in `.env` file
+- Virtual environment activated
+
+## Quick Start
+
+### 1. Initialize Database (First Time Only)
+
+Creates the database and installs required extensions (pgvector):
+
+```bash
+cd backend
+source .venv/bin/activate
+python scripts/init_database.py
+```
+
+This script is idempotent - safe to run multiple times.
+
+### 2. Apply All Migrations
+
+```bash
+alembic upgrade head
+```
+
+### 3. Check Current Migration Status
+
+```bash
+alembic current
+```
+
+### 4. View Migration History
+
+```bash
+alembic history --verbose
+```
+
+## Common Operations
+
+### Creating a New Migration
+
+#### Auto-generate from Model Changes (Recommended)
+
+After modifying your SQLAlchemy models:
+
+```bash
+alembic revision --autogenerate -m "describe your changes"
+```
+
+**Important**: Always review auto-generated migrations before applying them!
+
+#### Create Empty Migration
+
+For data migrations or complex changes:
+
+```bash
+alembic revision -m "describe your changes"
+```
+
+### Applying Migrations
+
+#### Upgrade to Latest
+
+```bash
+alembic upgrade head
+```
+
+#### Upgrade to Specific Revision
+
+```bash
+alembic upgrade <revision_id>
+```
+
+#### Upgrade One Step
+
+```bash
+alembic upgrade +1
+```
+
+### Rolling Back Migrations
+
+#### Downgrade One Step
+
+```bash
+alembic downgrade -1
+```
+
+#### Downgrade to Specific Revision
+
+```bash
+alembic downgrade <revision_id>
+```
+
+#### Downgrade All (Back to Empty Database)
+
+```bash
+alembic downgrade base
+```
+
+### Viewing Migration Information
+
+#### Current Version
+
+```bash
+alembic current
+```
+
+#### Migration History
+
+```bash
+alembic history
+```
+
+#### History with Details
+
+```bash
+alembic history --verbose
+```
+
+#### Show SQL Without Running
+
+```bash
+alembic upgrade head --sql
+```
+
+## Production Deployment
+
+### Initial Deployment
+
+```bash
+# 1. Initialize database and extensions
+python scripts/init_database.py
+
+# 2. Apply all migrations
+alembic upgrade head
+```
+
+### Updating Existing Deployment
+
+```bash
+# 1. Pull latest code
+git pull
+
+# 2. Activate virtual environment
+source .venv/bin/activate
+
+# 3. Install/update dependencies
+uv pip sync requirements.txt
+
+# 4. Apply new migrations
+alembic upgrade head
+
+# 5. Restart application
+# (depends on your deployment setup)
+```
+
+### Zero-Downtime Deployments
+
+For zero-downtime deployments, follow these practices:
+
+1. **Make migrations backward compatible**
+   - Add new columns as nullable first
+   - Keep old columns during transition period
+   - Use separate deployments for breaking changes
+
+2. **Run migrations before deploying code**
+   ```bash
+   # Terminal 1: Run migrations
+   alembic upgrade head
+   
+   # Terminal 2: Deploy new application code
+   # (after migrations complete)
+   ```
+
+3. **Test migrations in staging first**
+
+## Adding New Models
+
+When creating a new model:
+
+1. **Create the model file** in `app/models/`
+
+   ```python
+   # app/models/user.py
+   from app.models.base import Base
+   from sqlalchemy import Column, Integer, String
+   
+   class User(Base):
+       __tablename__ = "users"
+       
+       id = Column(Integer, primary_key=True)
+       username = Column(String(64), unique=True, nullable=False)
+   ```
+
+2. **Import in `app/models/__init__.py`**
+
+   ```python
+   from .base import Base
+   from .user import User
+   from .request_log import RequestLog, RequestMethod
+   
+   __all__ = ["Base", "User", "RequestLog", "RequestMethod"]
+   ```
+
+3. **Import in `alembic/env.py`**
+
+   ```python
+   # Add to the imports section
+   from app.models import User  # noqa: F401
+   ```
+
+4. **Generate migration**
+
+   ```bash
+   alembic revision --autogenerate -m "add users table"
+   ```
+
+5. **Review and apply**
+
+   ```bash
+   # Review the generated migration file
+   cat alembic/versions/<generated_file>.py
+   
+   # Apply it
+   alembic upgrade head
+   ```
+
+## Troubleshooting
+
+### Database Connection Issues
+
+If you get connection errors:
+
+```bash
+# Check PostgreSQL is running
+pg_isready
+
+# Verify .env configuration
+cat ../.env | grep DATABASE_URL
+
+# Test connection manually
+python scripts/init_database.py
+```
+
+### "Target database is not up to date"
+
+```bash
+# Check current version
+alembic current
+
+# Check expected version
+alembic heads
+
+# Upgrade to latest
+alembic upgrade head
+```
+
+### Migration Conflicts
+
+If you have multiple branches with migrations:
+
+```bash
+# List all heads
+alembic heads
+
+# Merge branches
+alembic merge <head1> <head2> -m "merge branches"
+
+# Apply merged migration
+alembic upgrade head
+```
+
+### Autogenerate Not Detecting Changes
+
+Make sure your model is:
+1. Imported in `alembic/env.py`
+2. Inheriting from the correct `Base`
+3. Has `__tablename__` defined
+
+### Extension Installation Fails
+
+If pgvector installation fails, install manually:
+
+```bash
+# As database superuser
+psql -d anonchat -c "CREATE EXTENSION vector;"
+```
+
+## Best Practices
+
+### Migration Development
+
+1. **Always review auto-generated migrations** - Alembic isn't perfect
+2. **Test migrations on a copy of production data**
+3. **Keep migrations small and focused** - One logical change per migration
+4. **Write descriptive migration messages**
+5. **Never modify applied migrations** - Create a new one instead
+
+### Migration Content
+
+1. **Include both upgrade and downgrade** - Always be able to roll back
+2. **Use batch operations for large tables** (see SQLAlchemy docs)
+3. **Consider data migrations separately** - Don't mix schema and data changes
+4. **Add indexes in separate migrations** for large tables
+5. **Use `op.execute()` for complex SQL** when needed
+
+### Production Safety
+
+1. **Back up the database** before running migrations
+2. **Test in staging first** with production-like data
+3. **Run migrations during low-traffic periods** if possible
+4. **Monitor the application** after migrations
+5. **Have a rollback plan** ready
+
+## Environment Variables
+
+Required in `.env`:
+
+```bash
+# Async connection (used by FastAPI)
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/anonchat
+
+# Note: Sync URL is auto-generated by replacing asyncpg with psycopg2
+```
+
+## Continuous Integration
+
+Example CI/CD pipeline step:
+
+```yaml
+# .github/workflows/deploy.yml
+- name: Run Database Migrations
+  run: |
+    cd backend
+    source .venv/bin/activate
+    python scripts/init_database.py
+    alembic upgrade head
+  env:
+    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+```
+
+## Additional Resources
+
+- [Alembic Documentation](https://alembic.sqlalchemy.org/)
+- [SQLAlchemy Documentation](https://docs.sqlalchemy.org/)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [pgvector Documentation](https://github.com/pgvector/pgvector)
+
+## Support
+
+For issues or questions:
+1. Check this README
+2. Review Alembic logs: `alembic history --verbose`
+3. Check application logs
+4. Consult the team's migration conventions

@@ -1,10 +1,10 @@
 import enum
-from datetime import datetime
 
-from app.core.database import Base
 from sqlalchemy import Column, DateTime, Enum, Float, Integer, String, Text
 from sqlalchemy.dialects.postgresql import INET, JSONB
 from sqlalchemy.sql import func
+
+from app.models.base import Base
 
 
 class RequestMethod(str, enum.Enum):
