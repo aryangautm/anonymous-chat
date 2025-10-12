@@ -12,7 +12,6 @@ from app.core.database import SessionLocal
 from app.crud.crud_request_log import crud_request_log
 from app.models.request_log import RequestMethod
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -64,7 +63,6 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             "cookie",
             "x-api-key",
             "x-auth-token",
-            "authorization",
             "proxy-authorization",
             "x-forwarded-for",  # Sometimes contains sensitive info
         }

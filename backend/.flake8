@@ -1,0 +1,28 @@
+[flake8]
+max-line-length = 88
+extend-ignore = E203, E266, E501, W503
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    .eggs,
+    *.egg,
+    build,
+    dist,
+    .tox,
+    alembic/versions
+max-complexity = 10
+per-file-ignores =
+    __init__.py:F401
+    alembic/env.py:E402
+    scripts/*.py:T201,E402
+
+# Enforce flake8-print to catch print statements in app code (not in scripts)
+# T201 = print found
+# T203 = pprint found
+# E402 = module level import not at top of file
+enable-extensions = T
+
+# Additional checks from flake8-bugbear and flake8-comprehensions are automatically enabled
+
