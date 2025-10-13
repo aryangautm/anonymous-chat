@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
 fastapi
 uvicorn[standard]
 semantic-router
@@ -13,3 +15,17 @@ flake8
 flake8-print
 flake8-bugbear
 flake8-comprehensions
+langchain
+langgraph
+langchain-postgres
+langgraph-checkpoint-postgres
+langchain-community
+unstructured
+pypdf
+python-docx
+openpyxl
+python-multipart
+pandas
+hf-xet
+sentence-transformers
+google-genai
