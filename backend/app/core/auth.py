@@ -20,3 +20,28 @@ def require_api_key(key: str = Security(api_key_scheme)):  # noqa: B008
             detail="Missing or invalid API key",
         )
     return "api-client"
+
+
+async def verify_firebase_token(token: str) -> str | None:
+    """
+    Verify Firebase authentication token.
+
+    TODO: Implement Firebase Admin SDK integration
+
+    Args:
+        token: Firebase ID token
+
+    Returns:
+        Firebase UID if valid, None otherwise
+    """
+    # TODO: Implement Firebase verification
+    # from firebase_admin import auth
+    # try:
+    #     decoded_token = auth.verify_id_token(token)
+    #     return decoded_token['uid']
+    # except Exception:
+    #     return None
+
+    # Temporary: For development/testing without Firebase
+    # This should be removed in production
+    return "None"

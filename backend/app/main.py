@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.routes import api_router
+from app.api.graphql import graphql_router
 from app.core.config import settings
 from app.middleware import RequestLoggingMiddleware, SecurityMiddleware
 
@@ -46,6 +47,9 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix="/v1")
+
+# Include GraphQL router
+app.include_router(graphql_router, prefix="/api")
 
 
 @app.get("/")

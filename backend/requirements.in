@@ -29,3 +29,4 @@ pandas
 hf-xet
 sentence-transformers
 google-genai
+strawberry-graphql[fastapi]
