@@ -19,5 +19,11 @@ class Settings(BaseConfig):
     CORS_ORIGINS: str
     APP_AUTH_KEY: str
 
+    EMBEDDING_MODEL: str = "sentence-transformers/all-mpnet-base-v2"
+    EMBEDDING_BATCH_SIZE: int = 32
+
+    GEMINI_API_KEY: str
+    GEMINI_CHAT_LLM: str = "gemini-2.5-flash"
+
 
 settings = Settings()
