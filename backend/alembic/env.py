@@ -22,10 +22,9 @@ from app.core.base_config import base_settings
 
 # Import all models here to ensure they're registered with Base.metadata
 # This is critical for autogenerate to detect model changes
-from app.models import RequestLog  # noqa: F401
+from app.models import *  # noqa: F401
 
 # Import Base separately to avoid triggering engine creation
-from app.models.base import Base
 
 # Add any new models here as they're created
 # from app.models import User, Message, etc.  # noqa: F401
