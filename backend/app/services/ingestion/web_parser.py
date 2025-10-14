@@ -1,9 +1,11 @@
 import bs4
 from langchain_community.document_loaders import WebBaseLoader
+from langchain_core.documents import Document
+from typing import List
 
 
 # Only keep post title, headers, and content from the full HTML.
-def load_web_content(url: str):
+async def load_web_content(url: str) -> List[Document]:
     """
     Load and parse web content from a URL.
 
@@ -20,6 +22,6 @@ def load_web_content(url: str):
         web_paths=(url,),
         bs_kwargs={"parse_only": bs4_strainer},
     )
-    docs = loader.load()
+    docs = await loader.aload()
 
     return docs
