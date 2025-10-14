@@ -1,11 +1,28 @@
 import uuid
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+from enum import Enum as PyEnum
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    Enum,
+)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from pgvector.sqlalchemy import Vector
 
 from app.models.base import Base
+
+
+class ProcessingStatus(str, PyEnum):
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
 
 
 class KnowledgeModule(Base):
@@ -30,6 +47,17 @@ class KnowledgeModule(Base):
     priority = Column(Integer, default=1, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False, index=True)
     module_metadata = Column(JSONB, nullable=True)
+    file_storage_key = Column(String(255), nullable=True)
+    processing_status = Column(
+        Enum(
+            ProcessingStatus,
+            name="processing_status",
+            create_type=True,
+            native_enum=True,
+        ),
+        default=ProcessingStatus.PENDING,
+        nullable=False,
+    )
 
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
