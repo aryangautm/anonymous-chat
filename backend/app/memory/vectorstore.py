@@ -43,6 +43,7 @@ async def get_vector_store():
                 "module_id",
                 "module",
                 "chunk_index",
+                "token_count",
                 "module",
                 "created_at",
             ],
