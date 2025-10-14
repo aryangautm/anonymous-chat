@@ -10,6 +10,7 @@ asyncpg
 psycopg2-binary
 alembic
 black
+boto3
 isort
 flake8
 flake8-print

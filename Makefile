@@ -54,7 +54,7 @@ db-history: ## Show migration history
 .PHONY: db-revision
 db-revision: ## Create a new migration (autogenerate from models)
 	@read -p "Migration message: " msg; \
-	cd backend && . .venv/bin/activate && alembic revision --autogenerate -m "$$msg"
+	cd backend && . .venv/bin/activate && alembic revision --autogenerate -m "$$msg" && python scripts/postprocess_migration.py
 
 .PHONY: db-revision-empty
 db-revision-empty: ## Create an empty migration file
