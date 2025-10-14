@@ -19,11 +19,22 @@ class Settings(BaseConfig):
     CORS_ORIGINS: str
     APP_AUTH_KEY: str
 
+    # AWS Configuration
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+    AWS_S3_BUCKET_NAME: str
+    AWS_REGION: str
+    AWS_S3_INTERNAL_ENDPOINT: str
+    AWS_S3_PUBLIC_URL: str
+
     EMBEDDING_MODEL: str = "sentence-transformers/all-mpnet-base-v2"
     EMBEDDING_BATCH_SIZE: int = 32
 
     GEMINI_API_KEY: str
     GEMINI_CHAT_LLM: str = "gemini-2.5-flash"
+
+    CHUNK_SIZE_TOKENS: int = 500
+    CHUNK_OVERLAP_TOKENS: int = 50
 
 
 settings = Settings()
