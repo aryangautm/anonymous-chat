@@ -8,7 +8,7 @@ from app.crud.crud_knowledge import knowledge_module_crud
 from app.schemas.knowledge import KnowledgeModuleCreate, KnowledgeModuleUpdate
 from app.models.persona import Persona
 
-# from app.tasks.knowledge_tasks import process_knowledge_module_task
+from app.tasks.knowledge_tasks import process_knowledge_module_task
 
 
 @strawberry.mutation
@@ -47,9 +47,8 @@ async def add_knowledge_module(
         db=info.context.db, persona_id=persona_id, obj_in=module_create
     )
 
-    # TODO: celery
     # Queue background task to process and generate embeddings
-    # process_knowledge_module_task.delay(str(module.id))
+    process_knowledge_module_task.delay(str(module.id))
 
     return KnowledgeModuleType(
         id=module.id,
@@ -110,10 +109,9 @@ async def update_knowledge_module(
     if not updated_module:
         raise ValueError("Failed to update module")
 
-    # TODO: celery
     # Re-process if content changed
-    # if input.content:
-    # process_knowledge_module_task.delay(str(module.id))
+    if input.content:
+        process_knowledge_module_task.delay(str(module.id))
 
     return KnowledgeModuleType(
         id=updated_module.id,
