@@ -14,6 +14,7 @@ class KnowledgeModuleType:
     priority: int
     is_active: bool
     metadata: strawberry.scalars.JSON | None
+    processing_status: str
     created_at: DateTime
     updated_at: DateTime
 
