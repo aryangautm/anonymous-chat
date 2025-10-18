@@ -27,7 +27,10 @@ python-docx
 openpyxl
 python-multipart
 pandas
+redis
+celery
 hf-xet
 sentence-transformers
 google-genai
+greenlet
 strawberry-graphql[fastapi]

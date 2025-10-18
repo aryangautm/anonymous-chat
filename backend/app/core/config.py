@@ -19,6 +19,10 @@ class Settings(BaseConfig):
     CORS_ORIGINS: str
     APP_AUTH_KEY: str
 
+    # Redis Configuration (for Celery)
+    REDIS_URL: str
+    REDIS_RATE_LIMIT_DB: int = 1
+
     # AWS Configuration
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
