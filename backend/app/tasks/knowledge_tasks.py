@@ -52,7 +52,6 @@ def process_knowledge_module_task(self, module_id: str):
         return {"error": "Module not found"}
 
     # Extract text based on module type
-    text_content = ""
     docs = []
     if module.module_type == "bio":
         docs.append(Document(page_content=module.content.get("text", "")))
@@ -92,8 +91,8 @@ def process_knowledge_module_task(self, module_id: str):
     else:
         return {"error": f"Unknown module type: {module.module_type}"}
 
-    if not text_content:
-        return {"error": "No text content to process"}
+    if not docs:
+        return {"error": "No content to process"}
 
     # Chunk text
     chunks: List[Document] = text_processor.chunk_text(
