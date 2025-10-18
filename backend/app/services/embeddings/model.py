@@ -13,7 +13,8 @@ class EmbeddingModel:
         if cls._embedding_model is None:
             print(f"Loading embedding model: {EMBEDDING_MODEL_NAME}")
             cls._embedding_model = HuggingFaceEmbeddings(
-                model_name=EMBEDDING_MODEL_NAME
+                model_name=EMBEDDING_MODEL_NAME,
+                model_kwargs={"device": "cpu"},
             )
             print(f"Embedding model loaded")
         return cls._embedding_model
