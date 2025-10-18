@@ -59,6 +59,7 @@ async def add_knowledge_module(
         priority=module.priority,
         is_active=module.is_active,
         metadata=module.module_metadata,  # Note: model uses module_metadata
+        processing_status=module.processing_status.value,
         created_at=module.created_at,
         updated_at=module.updated_at,
     )
@@ -122,6 +123,7 @@ async def update_knowledge_module(
         priority=updated_module.priority,
         is_active=updated_module.is_active,
         metadata=updated_module.module_metadata,
+        processing_status=updated_module.processing_status.value,
         created_at=updated_module.created_at,
         updated_at=updated_module.updated_at,
     )
