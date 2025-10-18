@@ -1,14 +1,20 @@
-from dataclasses import dataclass
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Request
+from strawberry.fastapi import BaseContext
 
 from app.models.user import User
 
 
-@dataclass
-class GraphQLContext:
+class GraphQLContext(BaseContext):
     """Context passed to all GraphQL resolvers."""
 
-    request: Request
-    db: AsyncSession
-    current_user: User | None = None
+    def __init__(
+        self,
+        request: Request,
+        db: AsyncSession,
+        current_user: User | None = None,
+    ):
+        super().__init__()
+        self.request = request
+        self.db = db
+        self.current_user = current_user
