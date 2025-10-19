@@ -9,7 +9,6 @@ class EmbeddingTools:
     def __init__(self):
         self.embedding_model = EmbeddingModel.get_embedding_model()
 
-    @classmethod
     def embed_query(cls, query: str) -> List[float]:
         """
         Embed a query string.
@@ -23,7 +22,6 @@ class EmbeddingTools:
 
         return query_embedding
 
-    @classmethod
     def embed_document(cls, text_document: List[str]) -> List[List[float]]:
         """
         Embed the document list
@@ -53,3 +51,6 @@ class EmbeddingTools:
 
         print(f"Embedded total {len(embeddings)} documents!")
         return embeddings
+
+
+embedding_tools = EmbeddingTools()
