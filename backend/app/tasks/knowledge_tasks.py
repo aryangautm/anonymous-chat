@@ -2,15 +2,18 @@ from uuid import UUID
 from typing import List
 from celery import Task
 
-from app.tasks.celery_app import celery_app
+from app.tasks.celery_config import celery_app
 from app.core.database import SessionLocal
 from app.models.knowledge import KnowledgeModule
 from app.services.ingestion.text_processor import text_processor
 from app.services.ingestion.document_parser import load_document
 from app.services.ingestion.web_parser import load_web_content
-from app.memory.vectorstore import vector_store
+from app.memory.vectorstore import get_vector_store
 from langchain_core.documents import Document
 from datetime import datetime
+
+
+vector_store = get_vector_store()
 
 
 class DatabaseTask(Task):
@@ -30,8 +33,8 @@ class DatabaseTask(Task):
             self._session = None
 
 
-@celery_app.task(base=DatabaseTask, bind=True)
-def process_knowledge_module_task(self, module_id: str):
+@celery_app.task(name="tasks.process_knowledge_module", base=DatabaseTask, bind=True)
+def process_knowledge_module(self, module_id: str):
     """
     Process knowledge module: chunk text and generate embeddings.
 
@@ -72,9 +75,8 @@ def process_knowledge_module_task(self, module_id: str):
         if "scraped_content" not in module.content:
             url = module.content.get("url")
             try:
-                import asyncio
 
-                scraped: List[Document] = asyncio.run(load_web_content(url))
+                scraped: List[Document] = load_web_content(url)
                 module.content["scraped_content"] = "\n\n".join(
                     [doc.page_content for doc in scraped]
                 )
@@ -83,7 +85,7 @@ def process_knowledge_module_task(self, module_id: str):
             except Exception as e:
                 return {"error": f"Failed to scrape URL: {str(e)}"}
 
-        docs.extend(scraped)
+            docs.extend(scraped)
 
     elif module.module_type == "document":
         docs.extend(load_document(module.file_storage_key))
@@ -105,7 +107,6 @@ def process_knowledge_module_task(self, module_id: str):
             {
                 "source_type": module.module_type,
                 "module_id": module.id,
-                "module": module,
                 "chunk_index": idx,
                 "created_at": datetime.now(),
             }
